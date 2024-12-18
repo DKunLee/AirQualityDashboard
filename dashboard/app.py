@@ -4,21 +4,16 @@ import plotly.express as px # For creating interactive visualizations
 import duckdb
 import pandas as pd
 
-if __name__ == "__main__":
-    app.run_server(debug=True)
-
 # Initialize the Dash application
 app = dash.Dash(__name__)
 
 # Define the layout of the dashboard
 app.layout = html.Div([
       dcc.Tabs([
-           # Tab for displaying a map of sensor locations
             dcc.Tab(
                   label="Sensor Locations",
                   children=[dcc.Graph(id="map-view")]
             ),
-            # Tab for plotting air quality parameters
             dcc.Tab(
                   label="Parameter Plots",
                   children=[
@@ -51,14 +46,12 @@ app.layout = html.Div([
       Input("map-view", "id")
 )
 def update_map(_):
-      # Connect to the database and fetch the latest parameter values
-      with duckdb.connect("../air_quality.db", read_only=True) as db_connection:
+      with duckdb.connect("../Air_Quality_Pipeline/air_quality.db", read_only=True) as db_connection:
         latest_values_df = db_connection.execute(
             "SELECT * FROM presentation.latest_param_values_per_location"
         ).fetchdf()
 
       latest_values_df.fillna(0, inplace=True)
-      # Create a scatter map using Plotly
       map_fig = px.scatter_mapbox(
             latest_values_df,
             lat="lat",
@@ -96,12 +89,11 @@ def update_map(_):
       Input("location-dropdown", "id"),
 )
 def update_dropdowns(_):
-      with duckdb.connect("../air_quality.db", read_only=True) as db_connection:
-            df = db_connection.execute(
+      with duckdb.connect("../Air_Quality_Pipeline/air_quality.db", read_only=True) as db_connection:
+        df = db_connection.execute(
             "SELECT * FROM presentation.daily_air_quality_stats"
-            ).fetchdf()
+        ).fetchdf()
 
-      # Generate options for locations and parameters
       location_options = [
             {"label": location, "value": location} for location in df["location"].unique()
       ]
@@ -114,9 +106,9 @@ def update_dropdowns(_):
 
       return (
             location_options,
-            df["location"].unique()[0], # Default location
+            df["location"].unique()[0],
             parameter_options,
-            df["parameter"].unique()[0], # Default parameter
+            df["parameter"].unique()[0],
             start_date,
             end_date,
       )
@@ -132,7 +124,7 @@ def update_dropdowns(_):
       ]
 )
 def update_plots(selected_location, selected_parameter, start_date, end_date):
-      with duckdb.connect("../air_quality.db", read_only=True) as db_connection:
+      with duckdb.connect("../Air_Quality_Pipeline/air_quality.db", read_only=True) as db_connection:
             daily_stats_df = db_connection.execute(
             "SELECT * FROM presentation.daily_air_quality_stats"
             ).fetchdf()
@@ -166,3 +158,6 @@ def update_plots(selected_location, selected_parameter, start_date, end_date):
       )
 
       return line_fig, box_fig
+
+if __name__ == "__main__":
+    app.run_server(debug=True)
