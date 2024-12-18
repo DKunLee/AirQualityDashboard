@@ -4,6 +4,11 @@ This simple project is an interactive web-based dashboard for monitoring and ana
 
 ---
 
+![Map Page](README_images/MapPage.png)
+![Detail Graph Page](README_images/DetailGraphPage.png)
+
+---
+
 ## Features ✨
 
 - **Sensor Location Map:** Visualize sensor locations on an interactive map with parameter information.
@@ -44,7 +49,6 @@ Ensure you have the following installed:
 │   ├── s3_exploration.ipynb      # S3 exploration
 ├── README.md                     # Project documentation
 ├── requirements.txt              # Python dependencies
-├── air_quality.db                # DuckDB database (generated)
 └── locations.json                # Location configuration for air quality sensors
 ```
 
@@ -62,19 +66,20 @@ Ensure you have the following installed:
 2. Install the required Python dependencies:
 
    ```bash
-   pip install -r requirements.txt
+   pip3 install -r requirements.txt
    ```
 
 3. Set up the database:
 
    ```bash
-   python pipeline/database_manage.py --create --database-path ./air_quality.db --ddl-query-parent-dir ./sql/ddl
+   python3 pipeline/database_manager.py --create --database-path ./air_quality.db --ddl-query-parent-dir ./sql/ddl
    ```
 
 4. Populate the database with air quality data:
 
    ```bash
-   python pipeline/extraction.py \
+   cd pipeline
+   python3 pipeline/extraction.py \
        --locations_file_path ./locations.json \
        --start_date 2024-01 \
        --end_date 2024-12 \
@@ -86,7 +91,8 @@ Ensure you have the following installed:
 5. Apply data transformations:
 
    ```bash
-   python pipeline/transformation.py --database_path ./air_quality.db --query_directory ./sql/dml/presentation
+   cd ..
+   python3 pipeline/transformation.py --database_path ./air_quality.db --query_directory ./sql/dml/presentation
    ```
 
 ---
@@ -96,7 +102,7 @@ Ensure you have the following installed:
 1. Start the dashboard application:
 
    ```bash
-   python dashboard/app.py
+   python3 dashboard/app.py
    ```
 
 2. Open your browser and navigate to:
